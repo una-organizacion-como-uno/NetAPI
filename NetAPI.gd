@@ -1,8 +1,10 @@
 extends Reference
 class_name NetAPI
 
+# API version. Server should send it to any new connected clients to check for a match
 const version = 1
 
+# Commands the client can send to the server
 enum Commands {
 	GLOBAL_PARAM_GET,
 	GLOBAL_PARAM_SET,
@@ -13,6 +15,10 @@ enum Commands {
 	GAME_PARAM_LIST,
 }
 
+
+# Data the server can send to the client
+# Maybe it should be renamed to Events and have one for each type of event, 
+# since it's not a response you can track to a request as in HTTP
 enum Responses {
 	OK, # Command executed succesfully
 	BUG, # Unexpected error
@@ -23,6 +29,9 @@ enum Responses {
 	INCORRECT_PARAM_TYPE,
 }
 
+
+# Helper class to turn response arrays into objects for easier handling
+# It's better not to serialize full objects
 class Response:
 	var type
 	var data
@@ -38,6 +47,7 @@ class Response:
 			return Response.new(Responses.ERROR, { "message" : "Ivalid array element type" })
 		return Response.new(arr[0], arr[1])
 
+# Description of each command and it's parameters. If a parameter doesn't have a type it accepts any
 const COMMAND_INFO = {
 	Commands.GLOBAL_PARAM_GET: {
 		"description" : "Retrieves a global gameplay param",
